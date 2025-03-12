@@ -1,94 +1,166 @@
 <?xml version="1.0"?>
-<robot name="my_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<!-- Revolute-Revolute Manipulator -->
+<robot name="rrbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:include filename="common_properties.xacro" />
+    <!-- Constants for robot dimensions -->
+    <xacro:property name="PI" value="3.1415926535897931" />
+    <xacro:property name="mass" value="0.1" /> <!-- arbitrary value for mass -->
+    <xacro:property name="width" value="0.1" /> <!-- Square dimensions (widthxwidth) of beams -->
+    <xacro:property name="height1" value="0.2" /> <!-- Link 1 -->
+    <xacro:property name="height2" value="1" /> <!-- Link 2 -->
+    <xacro:property name="height3" value="1" /> <!-- Link 3 -->
+    <xacro:property name="axel_offset" value="0.05" /> <!-- Space btw top of beam and the each joint -->
 
-    <xacro:property name="link2_length" value="0.1" />
-    <xacro:property name="link2_width" value="0.1" />
-    <xacro:property name="link2_height" value="1.0" />
+    <!-- Define colors -->
+    <material name="black">
+        <color rgba="0.0 0.0 0.0 1.0" />
+    </material>
 
-    <xacro:property name="link3_length" value="0.1" />
-    <xacro:property name="link3_width" value="0.1" />
-    <xacro:property name="link3_height" value="1.0" />
+    <material name="orange">
+        <color rgba="${255/255} ${108/255} ${10/255} 1.0" />
+    </material>
 
-    <link name="base_link">
-        <static>true</static>
+    <!-- Used for fixing robot to Gazebo 'base_link' -->
+    <link name="world" />
+
+    <joint name="joint1" type="continuous">
+        <parent link="world" />
+        <child link="link1" />
+        <axis xyz="0 0 1"/>
+    </joint>
+
+
+
+
+    <!-- Base Link -->
+    <link name="link1">
+        <collision>
+            <origin xyz="0 0 ${height1/2}" rpy="0 0 0" />
+            <geometry>
+                <box size="${width} ${width} ${height1}" />
+            </geometry>
+        </collision>
+
+        <visual>
+            <origin xyz="0 0 ${height1/2}" rpy="0 0 0" />
+            <geometry>
+                <box size="${width} ${width} ${height1}" />
+            </geometry>
+            <material name="orange" />
+        </visual>
+
         <inertial>
-            <mass value="1" />
-
-            <inertia ixx="1" ixy="0" ixz="0"
-                iyy="1" iyz="0"
-                izz="1" />
+            <origin xyz="0 0 ${height1/2}" rpy="0 0 0" />
+            <mass value="${mass}" />
+            <inertia
+                ixx="${mass / 12.0 * (width*width + height1*height1)}" ixy="0.0" ixz="0.0"
+                iyy="${mass / 12.0 * (height1*height1 + width*width)}" iyz="0.0"
+                izz="${mass / 12.0 * (width*width + width*width)}" />
         </inertial>
     </link>
 
-    <link name="link_1">
-        <inertial>
-            <mass value="1" />
+    <joint name="joint2" type="continuous">
+        <parent link="link1" />
+        <child link="link2" />
+        <origin xyz="0 ${width} ${height1 - axel_offset}" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.7" />
+    </joint>
 
-            <inertia ixx="1" ixy="0" ixz="0"
-                iyy="1" iyz="0"
-                izz="1" />
+    <!-- Middle Link -->
+    <link name="link2">
+        <collision>
+            <origin xyz="0 0 ${height2/2 - axel_offset}" rpy="0 0 0" />
+            <geometry>
+                <box size="${width} ${width} ${height2}" />
+            </geometry>
+        </collision>
+
+        <visual>
+            <origin xyz="0 0 ${height2/2 - axel_offset}" rpy="0 0 0" />
+            <geometry>
+                <box size="${width} ${width} ${height2}" />
+            </geometry>
+            <material name="black" />
+        </visual>
+
+        <inertial>
+            <origin xyz="0 0 ${height2/2 - axel_offset}" rpy="0 0 0" />
+            <mass value="${mass}" />
+            <inertia
+                ixx="${mass / 12.0 * (width*width + height2*height2)}" ixy="0.0" ixz="0.0"
+                iyy="${mass / 12.0 * (height2*height2 + width*width)}" iyz="0.0"
+                izz="${mass / 12.0 * (width*width + width*width)}" />
         </inertial>
     </link>
 
-    <link name="link_2">
-        <visual>
-            <geometry>
-                <box size="${link2_length} ${link2_width} ${link2_height}" />
-            </geometry>
-            <origin xyz="0 0 ${link2_height / 2.0}" rpy="0 0 0" />
-        </visual>
-        <xacro:box_inertia m="0.1" w="${link2_width}" h="${link2_height}" d="${link2_length}"
-            xyz="0 0 ${link2_height / 2.0}" rpy="0 0 0" />
+    <joint name="joint3" type="continuous">
+        <parent link="link2" />
+        <child link="link3" />
+        <origin xyz="0 ${width} ${height2 - axel_offset*2}" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        <dynamics damping="0.7" />
+    </joint>
+
+    <!-- Top Link -->
+    <link name="link3">
         <collision>
+            <origin xyz="0 0 ${height3/2 - axel_offset}" rpy="0 0 0" />
             <geometry>
-                <box size="${link2_length} ${link2_width} ${link2_height}" />
+                <box size="${width} ${width} ${height3}" />
             </geometry>
-            <origin xyz="0 0 ${link2_height / 2.0}" rpy="0 0 0" />
         </collision>
+
+        <visual>
+            <origin xyz="0 0 ${height3/2 - axel_offset}" rpy="0 0 0" />
+            <geometry>
+                <box size="${width} ${width} ${height3}" />
+            </geometry>
+            <material name="orange" />
+        </visual>
+
+        <inertial>
+            <origin xyz="0 0 ${height3/2 - axel_offset}" rpy="0 0 0" />
+            <mass value="${mass}" />
+            <inertia
+                ixx="${mass / 12.0 * (width*width + height3*height3)}" ixy="0.0" ixz="0.0"
+                iyy="${mass / 12.0 * (height3*height3 + width*width)}" iyz="0.0"
+                izz="${mass / 12.0 * (width*width + width*width)}" />
+        </inertial>
     </link>
 
-    <link name="link_3">
-        <visual>
-            <geometry>
-                <box size="${link3_length} ${link3_width} ${link3_height}" />
-            </geometry>
-            <origin xyz="0 0 ${link3_height / 2.0}" rpy="0 0 0" />
-        </visual>
-        <xacro:box_inertia m="0.1" w="${link3_width}" h="${link3_height}" d="${link3_length}"
-            xyz="0 0 ${link3_height / 2.0}" rpy="0 0 0" />
-        <collision>
-            <geometry>
-                <box size="${link3_length} ${link3_width} ${link3_height}" />
-            </geometry>
-            <origin xyz="0 0 ${link3_height / 2.0}" rpy="0 0 0" />
-        </collision>
-    </link>
+    <!-- Gazebo colors and frictions -->
+    <!-- Link1 -->
+    <gazebo reference="link1">
+        <material>
+            <diffuse> 1 0.423529412 0.039215686 1</diffuse>
+            <ambient> 1 0.423529412 0.039215686 1</ambient>
+            <specular>1 0.423529412 0.039215686 1</specular>
+        </material>
+    </gazebo>
 
-    <joint name="base_to_link1" type="continuous">
-        <parent link="base_link" />
-        <child link="link_1" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <axis xyz="0 0 1" />
-    </joint>
+    <!-- Link2 -->
+    <gazebo reference="link2">
+        <mu1>0.2</mu1>
+        <mu2>0.2</mu2>
+        <material>
+            <diffuse> 0 0 0 1</diffuse>
+            <ambient> 0 0 0 1</ambient>
+            <specular>0 0 0 1</specular>
+        </material>
+    </gazebo>
 
-    <joint name="link1_to_link2" type="continuous">
-        <parent link="link_1" />
-        <child link="link_2" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <axis xyz="0 1 0" />
-    </joint>
+    <!-- Link3 -->
+    <gazebo reference="link3">
+        <mu1>0.2</mu1>
+        <mu2>0.2</mu2>
+        <material>
+            <diffuse> 1 0.423529412 0.039215686 1</diffuse>
+            <ambient> 1 0.423529412 0.039215686 1</ambient>
+            <specular>1 0.423529412 0.039215686 1</specular>
+        </material>
+    </gazebo>
 
-    <joint name="link2_to_link3" type="continuous">
-        <parent link="link_2" />
-        <child link="link_3" />
-        <origin xyz="0 0 ${link2_height}" rpy="0 0 0" />
-        <axis xyz="0 1 0" />
-    </joint>
-
-
-    <!-- <xacro:include filename="transmission.xacro" /> -->
+    <!-- Joint states plugin -->
     <xacro:include filename="gazebo.xacro" />
-
 </robot>
