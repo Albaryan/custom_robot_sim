@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+    <gazebo>
+        <plugin
+            filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher">
+            <topic>/joint_states</topic>
+            <update_rate>60</update_rate>
+        </plugin>
+    </gazebo>
+
+
+    <gazebo>
+        <plugin
+            filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+            <joint_name>base_to_link1</joint_name>
+            <topic>joint1_control</topic>
+            <p_gain>1</p_gain>
+            <i_gain>0.1</i_gain>
+            <d_gain>0.01</d_gain>
+            <i_max>1</i_max>
+            <i_min>-1</i_min>
+            <cmd_max>1000</cmd_max>
+            <cmd_min>-1000</cmd_min>
+        </plugin>
+    </gazebo>
+
+    <gazebo>
+        <plugin
+            filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+            <joint_name>link1_to_link2</joint_name>
+            <topic>joint2_control</topic>
+            <p_gain>1</p_gain>
+            <i_gain>0.1</i_gain>
+            <d_gain>0.01</d_gain>
+            <i_max>1</i_max>
+            <i_min>-1</i_min>
+            <cmd_max>1000</cmd_max>
+            <cmd_min>-1000</cmd_min>
+        </plugin>
+    </gazebo>
+
+
+
+    <gazebo>
+        <plugin
+            filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+            <joint_name>link2_to_link3</joint_name>
+            <topic>joint3_control</topic>
+            <p_gain>1</p_gain>
+            <i_gain>0.1</i_gain>
+            <d_gain>0.01</d_gain>
+            <i_max>1</i_max>
+            <i_min>-1</i_min>
+            <cmd_max>1000</cmd_max>
+            <cmd_min>-1000</cmd_min>
+        </plugin>
+    </gazebo>
+
+
+</robot>
